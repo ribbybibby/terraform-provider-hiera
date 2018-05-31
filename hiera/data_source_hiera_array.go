@@ -34,7 +34,6 @@ func dataSourceHieraArrayRead(d *schema.ResourceData, meta interface{}) error {
 	hiera := meta.(Hiera)
 	v, err := hiera.Array(keyName)
 	if err != nil {
-		log.Println(err)
 		return err
 	}
 

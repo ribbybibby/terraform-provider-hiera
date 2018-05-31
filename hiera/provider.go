@@ -36,11 +36,9 @@ func Provider() terraform.ResourceProvider {
 }
 
 func providerConfigure(data *schema.ResourceData) (interface{}, error) {
-	hiera := Hiera{
-		Bin:    data.Get("bin").(string),
-		Config: data.Get("config").(string),
-		Scope:  data.Get("scope").(map[string]interface{}),
-	}
-
-	return hiera, nil
+	return NewHiera(
+		data.Get("bin").(string),
+		data.Get("config").(string),
+		data.Get("scope").(map[string]interface{}),
+	), nil
 }

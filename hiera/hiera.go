@@ -3,7 +3,6 @@ package hiera
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"os/exec"
 	"strings"
 
@@ -14,6 +13,14 @@ type Hiera struct {
 	Bin    string
 	Config string
 	Scope  map[string]interface{}
+}
+
+func NewHiera(bin string, config string, scope map[string]interface{}) Hiera {
+	return Hiera{
+		Bin:    bin,
+		Config: config,
+		Scope:  scope,
+	}
 }
 
 func (h *Hiera) Exec(arg ...string) ([]byte, error) {
@@ -43,18 +50,15 @@ func (h *Hiera) Array(key string) ([]interface{}, error) {
 
 	out, err := h.Exec("-a", key)
 	if err != nil {
-		log.Println(err)
 		return nil, err
 	}
 
 	err = json.Unmarshal(out, &f)
 	if err != nil {
-		log.Println(err)
 		return nil, err
 	}
 	if _, ok := f.([]interface{}); ok {
-		for i, v := range f.([]interface{}) {
-			log.Println(i)
+		for _, v := range f.([]interface{}) {
 			e = append(e, cast.ToString(v))
 		}
 	} else {
@@ -71,13 +75,11 @@ func (h *Hiera) Hash(key string) (map[string]interface{}, error) {
 
 	out, err := h.Exec("-h", key)
 	if err != nil {
-		log.Println(err)
 		return nil, err
 	}
 
 	err = json.Unmarshal(out, &f)
 	if err != nil {
-		log.Println(err)
 		return nil, err
 	}
 
@@ -96,13 +98,11 @@ func (h *Hiera) Value(key string) (string, error) {
 
 	out, err := h.Exec(key)
 	if err != nil {
-		log.Println(err)
 		return "", err
 	}
 
 	err = json.Unmarshal(out, &f)
 	if err != nil {
-		log.Println(err)
 		return "", err
 	}
 

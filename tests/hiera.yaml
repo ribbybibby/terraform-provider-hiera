@@ -1,0 +1,13 @@
+---
+:backends:
+  - yaml
+
+:hierarchy:
+  - service/%{service}
+  - environment/%{environment}
+  - common
+
+:yaml:
+  :datadir: ../tests/hieradata/
+
+:merge_behavior: deeper

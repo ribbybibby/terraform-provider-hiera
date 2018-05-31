@@ -4,21 +4,18 @@ This provider implements data sources that can be used to perform hierachical da
 
 This is useful for providing configuration values in an environment with a high level of dimensionality or for making values from an existing Puppet deployment available in Terraform.
 
-
 ## Requirements
-* Terraform 0.10.x
-* Go 1.9 (to build the provider plugin)
+* [Terraform](https://www.terraform.io/downloads.html) 0.10.x
+* [Go](https://golang.org/doc/install) 1.9 (to build the provider plugin)
+* [Hiera](https://puppet.com/docs/hiera/3.3/index.html) (version v3)
 
 ## Usage
-Hiera must be installed locally and configured correctly.
-
-### Provider
-
-```
+To configure the provider:
+```hcl
 provider "hiera" {}
 ```
 Hiera isn't very useful without scope variables to inform its lookups:
-```
+```hcl
 provider "hiera" {
   scope {
     environment = "live"
@@ -27,7 +24,7 @@ provider "hiera" {
 }
 ```
 By default, the provider expects `hiera` to be available in your `$PATH`. It will also look for the configuration file at `/etc/puppetlabs/puppet/hiera.yaml`. You can override both those values if you so wish:
-```
+```hcl
 provider "hiera" {
   config = "~/hiera.yaml"
   bin    = "/usr/local/bin/hiera"
@@ -37,22 +34,47 @@ provider "hiera" {
   }
 }
 ```
-### Data Sources
+## Data Sources
 This provider only implements data sources.
-* `hiera` - retrieves any flat value (string, int, bool) and returns it as a string
-* `hiera_array`- returns an array as a list
-* `hiera_hash` - returns a hash as a map
-
-All of the data sources accept only one parameter: the key to lookup.
-```
-data "hiera_hash" "tags" {
+#### Hash
+To retrieve a hash:
+```hcl
+data "hiera_hash" "aws_tags" {
   key = "aws_tags"
 }
 ```
+The following output parameters are returned:
+* `id` - matches the key
+* `key` - the queried key
+* `value` - the hash, represented as a map
 
-All flat values are returned as strings because Terraform doesn't support typing. Instead, it performs implicit conversions depending on the usage of a particular variable.
+Terraform doesn't support nested maps or other more complex data structures. Any keys containing nested elements won't be returned.
 
-Terraform doesn't support complex data structures either (lists of maps, maps of lists, nested maps) so neither do these data sources. If you feed `hiera_array` or `hiera_hash` a complicated value their behaviour could be unpredictable but in my testing I've found they will drop the keys/items they don't understand and keep the ones they do.
+#### Array
+To retrieve an array:
+```hcl
+data "hiera_array" "java_opts" {
+  key = "java_opts"
+}
+```
+The following output parameters are returned:
+* `id` - matches the key
+* `key` - the queried key
+* `value` - the array (list)
+
+#### Value
+To retrieve any other flat value:
+```hcl
+data "hiera" "aws_cloudwatch_enable" {
+  key = "aws_cloudwatch_enable"
+}
+```
+The following output parameters are returned:
+* `id` - matches the key
+* `key` - the queried key
+* `value` - the value
+
+All values are returned as strings because Terraform doesn't implement other types like int, float or bool. The values will be implicitly converted into the appropriate type depending on usage.
 
 ## Example
 Here's an example of setting different values and data types at multiple levels in Hiera and then retrieving those values as data sources for use in outputs.
@@ -99,7 +121,7 @@ java_opts:
   - '-Xmx2g'
 ```
 **main.tf**
-```
+```hcl
 provider "hiera" {
   scope {
     environment = "live"
@@ -141,7 +163,7 @@ output "java_opts" {
 
 ```
 Then, plan and apply:
-```
+```sh
 $ terraform plan
 Refreshing Terraform state in-memory prior to plan...
 The refreshed state will be used to calculate this plan, but will not be
@@ -183,3 +205,5 @@ java_opts = [
     -Dspring.profiles.active=live
 ]
 ```
+## TODO
+Hiera v3 is deprecated now in favour of the new Hiera v5 which is built directly into Puppet. This provider won't work with v5 because it relies on the command line script which has been removed. It's possible we could use `puppet lookup` in its place.
