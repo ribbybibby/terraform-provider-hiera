@@ -31,15 +31,15 @@ func dataSourceHieraArrayRead(d *schema.ResourceData, meta interface{}) error {
 
 	keyName := d.Get("key").(string)
 
-	config := meta.(Config)
-	a, err := config.Array(keyName)
+	hiera := meta.(Hiera)
+	v, err := hiera.Array(keyName)
 	if err != nil {
 		log.Println(err)
 		return err
 	}
 
 	d.SetId(keyName)
-	d.Set("value", a)
+	d.Set("value", v)
 
 	return nil
 }

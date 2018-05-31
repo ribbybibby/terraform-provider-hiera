@@ -28,8 +28,8 @@ func dataSourceHieraRead(d *schema.ResourceData, meta interface{}) error {
 
 	keyName := d.Get("key").(string)
 
-	config := meta.(Config)
-	v, err := config.Value(keyName)
+	hiera := meta.(Hiera)
+	v, err := hiera.Value(keyName)
 	if err != nil {
 		log.Println(err)
 		return err

@@ -28,15 +28,15 @@ func dataSourceHieraHashRead(d *schema.ResourceData, meta interface{}) error {
 
 	keyName := d.Get("key").(string)
 
-	config := meta.(Config)
-	h, err := config.Hash(keyName)
+	hiera := meta.(Hiera)
+	v, err := hiera.Hash(keyName)
 	if err != nil {
 		log.Println(err)
 		return err
 	}
 
 	d.SetId(keyName)
-	d.Set("value", h)
+	d.Set("value", v)
 
 	return nil
 }

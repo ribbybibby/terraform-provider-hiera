@@ -11,17 +11,17 @@ func Provider() terraform.ResourceProvider {
 			"config": {
 				Type:     schema.TypeString,
 				Optional: true,
-				Default:  "./hiera.yaml",
+				Default:  "/etc/puppetlabs/puppet/hiera.yaml",
 			},
 			"bin": {
 				Type:     schema.TypeString,
 				Optional: true,
-				Default:  "/usr/bin/hiera",
+				Default:  "hiera",
 			},
 			"scope": {
 				Type:     schema.TypeMap,
-				Required: true,
-				Default:  nil,
+				Default:  map[string]interface{}{},
+				Optional: true,
 			},
 		},
 
@@ -36,11 +36,11 @@ func Provider() terraform.ResourceProvider {
 }
 
 func providerConfigure(data *schema.ResourceData) (interface{}, error) {
-	config := Config{
+	hiera := Hiera{
 		Bin:    data.Get("bin").(string),
 		Config: data.Get("config").(string),
 		Scope:  data.Get("scope").(map[string]interface{}),
 	}
 
-	return config, nil
+	return hiera, nil
 }
