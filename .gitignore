@@ -1,0 +1,6 @@
+*.log
+*.yaml
+*.tf
+*.tfstate
+*.tfstate.backup
+terraform-provider-hiera
