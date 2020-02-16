@@ -4,6 +4,8 @@ This provider implements data sources that can be used to perform hierachical da
 
 This is useful for providing configuration values in an environment with a high level of dimensionality or for making values from an existing Puppet deployment available in Terraform.
 
+It only supports the deprecated Hiera v3. For version 5 support, see [terraform-provider-hiera5](https://gitlab.com/sbitio/terraform-provider-hiera5).
+
 ## Requirements
 * [Terraform](https://www.terraform.io/downloads.html) 0.10.x
 * [Go](https://golang.org/doc/install) 1.9 (to build the provider plugin)
@@ -205,5 +207,3 @@ java_opts = [
     -Dspring.profiles.active=live
 ]
 ```
-## TODO
-Hiera v3 is deprecated now in favour of the new Hiera v5 which is built directly into Puppet. This provider won't work with v5 because it relies on the command line script which has been removed. It's possible we could use `puppet lookup` in its place.
